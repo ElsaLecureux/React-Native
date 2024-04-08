@@ -32,11 +32,12 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-        <Text style={styles.baseText}>
-          num
-        <Text style={styles.innerText}> and red</Text>
+      <View style={styles.textContainer}>
+      <Text style={styles.baseText}>
+          Result
         </Text>
-      <View style={styles.ligne}>
+      </View>
+      <View style={styles.line}>
           <TouchableOpacity style={styles.button} onPress={() =>console.log(7)}>
             <Text>7</Text>
           </TouchableOpacity >
@@ -47,7 +48,7 @@ export default function App() {
             <Text>9</Text>
           </TouchableOpacity>
       </View>
-      <View >
+      <View style={styles.line}>
           <TouchableOpacity style={styles.button} onPress={() =>console.log(4)}>
             <Text>4</Text>
           </TouchableOpacity >
@@ -58,7 +59,7 @@ export default function App() {
             <Text>6</Text>
           </TouchableOpacity>
       </View>
-      <View >
+      <View style={styles.line}>
           <TouchableOpacity style={styles.button} onPress={() =>console.log(1)}>
             <Text>1</Text>
           </TouchableOpacity >
@@ -69,7 +70,7 @@ export default function App() {
             <Text>3</Text>
           </TouchableOpacity>
       </View>
-      <View >
+      <View style={styles.line}>
           <TouchableOpacity style={styles.button} onPress={addition}>
             <Text>+</Text>
           </TouchableOpacity >
@@ -80,44 +81,60 @@ export default function App() {
             <Text>-</Text>
           </TouchableOpacity>
       </View>
-      <View>
+      <View style={styles.line}>
           <TouchableOpacity style={styles.button} onPress={division}>
             <Text>÷</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={multiplication}>
             <Text>x</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={total}>
-            <Text>=</Text>
+          <TouchableOpacity style={styles.button} onPress={clear}>
+            <Text>C</Text>
           </TouchableOpacity>
       </View>  
-        <TouchableOpacity style={styles.button} onPress={clear}>
-          <Text>Clear</Text>
+        <TouchableOpacity style={styles.button} onPress={total}>
+          <Text>=</Text>
         </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  textContainer: {
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 15,
+    alignItems:'center',
+  },
   baseText: {
+    alignItems:'center',
+    justifyContent:'center',
+    fontSize: 30,
     fontWeight: 'bold',
   },
   innerText: {
     color: 'red',
   },
   container: {
-    flex: 1,
+    flex: 2,
     justifyContent: 'center',
-    paddingHorizontal: 10,
+    padding: 40,
   },
   button: {
-    alignItems: 'center',
+    alignItems:'center',
+    justifyContent:'center',
     backgroundColor: '#DDDDDD',
-    padding: 8,
-    marginBottom: 2,
+    padding: 30,
+    marginBottom: 15,
+    marginRight: 15,
+    borderRadius:10,
+    elevation: 8,
   },
-  ligne: {
+  line: {
     flex: 1,
     flexDirection: "row",
+    justifyContent: 'center',
+    marginRight: 2,
   }
 });
