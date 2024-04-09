@@ -1,30 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
 
 export default function App() {
 
-  function addition() {
+  const [text, setText] = useState('');
+  const [numbers, setNumbers] = useState([]);
+  const [operators, setOperators] = useState([]);
+
+  function calculus() {
+    console.log(operators.length)
+    //  if (numbers.length > 1 && operators.length > 0) {
+    //  const result = `${numbers[numbers.length - 1]} ${operators[operators.length]} ${numbers[numbers.length]}`;
+    //  showTotal(result);
+    //  }
   }
 
-  function substraction() {
-
+  function addOperator(op) {
+      setOperators(prevState => ([...prevState, op]));
+      console.log('operator', operators);
   }
 
-  function multiplication(){
-
-  }
-
-  function division(){
-
-  }
-
-  function total(){
-
+  function showTotal(result){
+    setText(result);
   }
 
   function clear(){
-   
+    setNumbers([]);
+    setOperators([]);
+    setText('');   
+  }
+
+  function addNumber(num){
+    if (operators.length === 0 || operators.length === numbers.length) {
+      setNumbers(prevState => ([...prevState, num]));
+    } else {
+      const changeNumber = [...numbers];
+      changeNumber[numbers.length] = numbers[numbers.length] + num;
+      setNumbers(changeNumber);
+      console.log('changeNumber', changeNumber[numbers.length]);
+    }    
+    console.log('numbers', numbers);
   }
 
 
@@ -33,99 +48,96 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-      <Text style={styles.baseText}>
-          Result
+        <Text style={styles.baseText}>
+          {text}
         </Text>
       </View>
       <View style={styles.line}>
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(7)}>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(7)}>
             <Text>7</Text>
           </TouchableOpacity >
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(8)}>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(8)}>
             <Text>8</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(9)}>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(9)}>
             <Text>9</Text>
           </TouchableOpacity>
-      </View>
-      <View style={styles.line}>
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(4)}>
-            <Text>4</Text>
-          </TouchableOpacity >
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(5)}>
-            <Text>5</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => console.log(6)}>
-            <Text>6</Text>
-          </TouchableOpacity>
-      </View>
-      <View style={styles.line}>
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(1)}>
-            <Text>1</Text>
-          </TouchableOpacity >
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(2)}>
-            <Text>2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(3)}>
-            <Text>3</Text>
-          </TouchableOpacity>
-      </View>
-      <View style={styles.line}>
-          <TouchableOpacity style={styles.button} onPress={addition}>
+          <TouchableOpacity style={styles.button} onPress={() => addOperator('+')}>
             <Text>+</Text>
           </TouchableOpacity >
-          <TouchableOpacity style={styles.button} onPress={() =>console.log(0)}>
-            <Text>0</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={substraction}>
-            <Text>-</Text>
-          </TouchableOpacity>
       </View>
       <View style={styles.line}>
-          <TouchableOpacity style={styles.button} onPress={division}>
-            <Text>÷</Text>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(4)}>
+            <Text>4</Text>
+          </TouchableOpacity >
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(5)}>
+            <Text>5</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={multiplication}>
+          <TouchableOpacity style={styles.button} onPress={() => addNumber(6)}>
+            <Text>6</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => addOperator('-')}>
+            <Text>-</Text>
+          </TouchableOpacity>          
+      </View>
+      <View style={styles.line}>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(1)}>
+            <Text>1</Text>
+          </TouchableOpacity >
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(2)}>
+            <Text>2</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() =>addNumber(3)}>
+            <Text>3</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => addOperator('*')}>
             <Text>x</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={clear}>
-            <Text>C</Text>
-          </TouchableOpacity>
-      </View>  
-        <TouchableOpacity style={styles.button} onPress={total}>
-          <Text>=</Text>
+          </TouchableOpacity>         
+      </View>
+      <View style={styles.line}>
+        <TouchableOpacity style={styles.button} onPress={() => addOperator('/')}>
+          <Text>÷</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() =>addNumber(0)}>
+          <Text>0</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={calculus}>
+          <Text>=</Text>
+        </TouchableOpacity>     
+        <TouchableOpacity style={styles.button} onPress={clear}>
+          <Text>C</Text>
+        </TouchableOpacity>                    
+      </View>        
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   textContainer: {
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 20,
+    borderBottomWidth: 1,
     marginBottom: 15,
-    alignItems:'center',
+    alignItems:'flex-end',
+    justifyContent: 'flex-end',
+    flex: 2,
+    padding: 20,
   },
   baseText: {
     alignItems:'center',
-    justifyContent:'center',
+    justifyContent:'flex-end',
     fontSize: 30,
     fontWeight: 'bold',
+    color: '#184E77',
   },
-  innerText: {
-    color: 'red',
-  },
-  container: {
-    flex: 2,
+  container: {  
+    flex: 1,
     justifyContent: 'center',
-    padding: 40,
+    padding: 20,
   },
   button: {
     alignItems:'center',
     justifyContent:'center',
-    backgroundColor: '#DDDDDD',
-    padding: 30,
+    backgroundColor: '#76C893',
+    padding: 25,
     marginBottom: 15,
     marginRight: 15,
     borderRadius:10,
