@@ -15,7 +15,7 @@ export default function App() {
 
   function loadData() {
     setIsLoading(true);
-    axios.get(`${baseUrl}/api/users/1`).then((response) => {
+    axios.get(`https://open-meteo.com/en/docs#timezone=Europe%2FLondon`).then((response) => {
       console.log(response.data);
     });
   }
