@@ -1,12 +1,11 @@
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Image} from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Image, SafeAreaView, FlatList} from 'react-native';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import { Asset } from 'expo-asset';
+import moment from 'moment';
 
 export default function App() {
 
   const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
   const APIKEY = '5c6d1babe6164d7b9e5d473010e5b8f5';
   const [forecast, setForecast] = useState({});
   const [hourlyForecast, setHourlyForecast] = useState({});
@@ -14,14 +13,49 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [text, setText] = useState('Waiting..');
 
-  //expo fonts and essets
-  
-  //https://docs.expo.dev/versions/latest/sdk/asset/
-  
-  //https://blog.expo.dev/react-native-flatlist-made-easy-20fca51e0327
+  const codes = {
+    0 : "01",
+    1 : "02",
+    2 : "02",
+    3 : "02",
+    45 : "50",
+    48 : "50",
+    51 : "10",
+    53 : "10",
+    55 : "10",
+    56 : "10",
+    57 : "10",
+    61 : "09",
+    63 : "09",
+    65 : "09",
+    66 : "09",
+    67 : "09",
+    71 : "13",
+    73 : "13",
+    75 : "13",
+    77 : "13",
+    80 : "09",
+    81 : "09",
+    82 : "09",
+    85 : "13",
+    86 : "13",
+    95 : "11",
+    96 : "11",
+    99 : "11"
+}
+
+function getTimeOfTheDay (index) {
+  const now = new Date(hourlyForecast.hourly.time[index]);
+  const sunrise = new Date(forecast.sys.sunrise * 1000);
+  const sunset = new Date(forecast.sys.sunset * 1000);
+    if(sunrise <= now && now <= sunset) {
+      return 'd';
+    } else if (sunrise > now || now > sunset) {
+      return'n';
+    }
+  }
 
   useEffect(() => {
-    
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -58,90 +92,94 @@ export default function App() {
       
     })();
   }, []);
-  if(hourlyForecast) {
-    console.log(hourlyForecast);
-  }
-
+ 
    return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {isLoading &&
         (<ActivityIndicator size="large" />)
       }
-      { !isLoading && 
-      (<ScrollView contentContainerStyle={styles.ScrollViewContainer}>
-        <View style={styles.forecastContainer}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{text}</Text>
-          </View>
-          <Text style={styles.place}>{forecast.name}</Text>
-          <View style={styles.generaleWeatherContainer}>
-            <Image
-                style={{width: 150, height: 150}}
-                source={{
-                  uri: `https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`,
-                }}
-                >
-            </Image>
-            <Text>{forecast.main.temp}</Text>
-          </View>
-          <Text style={styles.weatherDescription}>{forecast.weather[0].description}</Text>
-          <View style={styles.humidtyAndTempertureContainer}>
-            <View style={styles.temperatureContainer}>
-              <View style= {styles.imageContainer}>
-                <Image
-                  style={styles.forecastImage}
-                  source={require('./assets/temperature.svg')}
-                >
-              </Image>
-              </View>
-              <View>
-                <Text>{forecast.main.feels_like}</Text>
-                <Text>Feels Like</Text>
-              </View> 
-            </View>  
-            <View style={styles.temperatureContainer}>
+      { !isLoading &&
+      (<ScrollView contentContainerStyle={{ flexGrow: 1 }}  style={styles.scrollViewContainer}>
+        <View style={styles.container}>
+          <View style={styles.forecastContainer}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>{text}</Text>
+            </View>
+            <Text style={styles.place}>{forecast.name}</Text>
+            <View style={styles.generaleWeatherContainer}>
               <Image
-                style={{width: 50, height: 50}}
-                source={require('./assets/humidity.svg')}
-              >
+                  style={{width: 150, height: 150}}
+                  source={{
+                    uri: `https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`,
+                  }}
+                  >
               </Image>
-              <Text>{forecast.main.humidity}</Text>
-              <Text>Humidity</Text>
+              <Text>{forecast.main.temp}°C</Text>
+            </View>
+            <Text style={styles.weatherDescription}>{forecast.weather[0].description}</Text>
+            <View style={styles.humidityAndTemperatureContainer}>
+              <View style={styles.temperatureContainer}>
+                <View style= {styles.imageContainer}>
+                  <Image
+                    style={{width: 40, height: 40}}
+                    source={require('./assets/temperature.png')}/>
+                </View>
+                <View>
+                  <Text>{forecast.main.feels_like}</Text>
+                  <Text>Feels Like</Text>
+                </View> 
+              </View>  
+              <View style={styles.temperatureContainer}>
+                <Image
+                  style={{width: 40, height: 40}}
+                  source={require('./assets/humidity.png')}/>
+                <Text>{forecast.main.humidity}</Text>
+                <Text>Humidity</Text>
+              </View>
             </View>
           </View>
+          <View  style={{ flex: 1 }}>
+            <View style={styles.container}>
+              <Text style={styles.title}>
+                  Hourly Forecast
+              </Text>
+            </View>            
+            <FlatList contentContainerStyle={{ flexGrow: 1 }} style={styles.scrollViewContainer} horizontal
+              data={hourlyForecast.hourly.time}
+              keyExtractor={(time) => time}
+              renderItem={({item, index})=> 
+              <View style={styles.hourlyForecastContainer}>
+                  <View>
+                    <Text >
+                    {moment(item).hours()} h
+                    </Text>
+                  </View>
+                  <Image
+                      style={{width: 80, height:80}}
+                      source={{
+                      uri: `http://openweathermap.org/img/wn/${codes[hourlyForecast.hourly.weather_code[index]] + getTimeOfTheDay(index)}@4x.png`
+                      }}
+                    />
+                  <View>
+                    <Text >
+                    {hourlyForecast.hourly.temperature_2m[index]}
+                    </Text>
+                  </View>
+                </View>
+            }
+            />
+              </View> 
         </View>
-        <View style={styles.container}>
-          <View>
-            <Text>
-                Hourly Forecast
-            </Text>
-          </View>            
-          <View>
-            <Text>
-              Time
-            </Text>
-            <Image
-              style={{width: 50, height: 50}}
-              source={require('./assets/humidity.svg')}
-            >
-            </Image>
-            <Text>
-              Temp °C
-            </Text>
-          </View>
-        </View>
-      </ScrollView>)
-      }
-    </View>
+      </ScrollView>
+    )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  ScrollViewContainer: {
+  scrollViewContainer: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   container: {
     flex: 1,
@@ -157,41 +195,50 @@ const styles = StyleSheet.create({
   },
   generaleWeatherContainer: {
     flex: 1,
-    flexDirection: 'Row',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  humidtyAndTempertureContainer: {
+  humidityAndTemperatureContainer: {
     flex: 1,
-    flexDirection: 'Row',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: 250,
+    justifyContent: 'space-around',
+    width: '100%',
   },
   titleContainer:{
     backgroundColor: '#FCA311',
-    padding: 15,
+    padding: 5,
     borderRadius: 10,
     marginBottom: 10,
+    marginTop: 40,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center,'
   },
   title: {
     color: '#14213D',
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: 'bold',
   },
   place: {
     fontSize: 20,
   },
-  forecastImage: {
-    width: 50,
-    height: 50
-  },
   temperatureContainer: {
     backgroundColor: '#E5E5E5',
     borderRadius: 10,
-    padding: 30,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   weatherDescription: {
-    fontSize: 30,
+    fontSize: 25,
   },
+  hourlyForecastContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 2,
+  }
 });
