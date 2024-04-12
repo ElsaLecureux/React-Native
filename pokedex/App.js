@@ -37,7 +37,7 @@ export default function App() {
   }
 
   function fetchNextPage () {
-    setOffset(offset + 20);
+    setOffset(offset + 10);
     getPokemons();
   }
 
@@ -57,6 +57,7 @@ export default function App() {
             keyExtractor={(item, index) => index.toString()}
             onEndReached={fetchNextPage}
             onEndReachedThreshold={0.8}
+            numColumns={2}
             ListFooterComponent={<ActivityIndicator size="large" />}
             renderItem={({
               item, index}) => (
