@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Button, ActivityIndicator, Image, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlatList } from 'react-native-web';
+import { useRef } from "react";
 
 export default function App() {
 
@@ -13,10 +13,11 @@ export default function App() {
 
   const getPokemons = async() => {
     try {
-     const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`);
+     const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`);
      const responseJson = await response.json();
-     console.log(responseJson.results);
-     responseJson.results.map((pokemon)  => getPokemonDetails(pokemon))
+     await Promise.all(
+        responseJson.results.map((pokemon)  => getPokemonDetails(pokemon))
+      )
      setIsLoading(false);
     } catch(error){
       console.error(error);
@@ -27,12 +28,17 @@ export default function App() {
     try {
       const pokemonDetails = await fetch(`${pokemon.url}`);
       const pokemonDetailsJson = await pokemonDetails.json();
-      console.log(pokemonDetailsJson)
+      console.log(pokemonDetailsJson);
       setPokemons(prevState => [...prevState, pokemonDetailsJson]);
       setIsLoading(false);
      } catch(error){
        console.error(error);
      }
+  }
+
+  function fetchNextPage () {
+    setOffset(offset + 20);
+    getPokemons();
   }
 
  useEffect(() => {
@@ -49,16 +55,27 @@ export default function App() {
           (<FlatList contentContainerStyle={{ flexGrow: 1 }} style={{flex: 1}}
             data={pokemons}
             keyExtractor={(item, index) => index.toString()}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={0.8}
+            ListFooterComponent={<ActivityIndicator size="large" />}
             renderItem={({
               item, index}) => (
             <View key={index.toString()}>
-              <Text>
-               {item.name}
-              </Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text>
+                {item.name}
+                </Text>
+                <Image
+                  style={{width: 100, height:100}}
+                  source={{
+                  uri: `${item.sprites.front_default}`
+                  }}
+                />
+              </View>
             </View>)
             }
           />
-        )};
+        )}
       </SafeAreaView>
     )
   }
@@ -88,6 +105,15 @@ export default function App() {
       </View>
     );
   }  
+
+  function CollectionScreen({ route ,navigation }) {
+    
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Collection Screen</Text> 
+      </View>
+    );
+  }  
   
   
   const Stack = createNativeStackNavigator();
@@ -95,8 +121,23 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen}/>
+        <Stack.Screen   name="Home" 
+        component={HomeScreen} 
+        options = { ({navigation}) => ({
+            title: "Pokedex",
+            headerStyle: {
+                backgroundColor: '#fff',
+            },
+            headerRight:  () => (
+              <Button
+                onPress={() => navigation.navigate('Collection')}
+                title="Collection"
+              />
+            )
+        })}
+        />
         <Stack.Screen name="Details" component={DetailsScreen}/>
+        <Stack.Screen name="Collection" component={CollectionScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
